@@ -10,58 +10,100 @@ export default function Formelrad() {
         r: "",
         p: "",
         message: ""
-    })
+    });
 
     const [colors, setColors] = useState({
         u: "black",
         i: "black",
         r: "black",
         p: "black"
-    })
+    });
+
+    const handleClear = (event) => {
+        event.preventDefault();
+        console.log("handleClear");
+
+        setValues({
+            u: "",
+            i: "",
+            r: "",
+            p: "",
+            message: ""
+        });
+
+        setColors({
+            u: "black",
+            i: "black",
+            r: "black",
+            p: "black"
+        });
+    };
 
     const calculate = (event) => {
         event.preventDefault();
         console.log("calculate");
 
-        let count = 0;
-        if (values.u === "") count++;
-        if (values.i === "") count++;
-        if (values.r === "") count++;
-        if (values.p === "") count++;
+        const emptyFields = [values.u, values.i, values.r, values.p].filter(v => v === "").length;
 
-        if (count !== 2) {
-            setValues(values => ({ ...values, message: "2 Felder leer lassen, 2 Felder ausfüllen" }));
+        if (emptyFields !== 2) {
+            setValues(values => ({ ...values, message: "Bitte genau zwei Felder leer lassen!" }));
+            return;
         } else {
             setValues(values => ({ ...values, message: "" }));
-
-            if (values.i === "" && values.r === "") {
-                /*calculate i and r */
-                setValues(values => ({ ...values, i: values.p / values.u }));
-                setValues(values => ({ ...values, r: values.u * values.u / values.p }));
-            } else if (values.i === "" && values.p === "") {
-                /*calculate i and p */
-                setValues(values => ({ ...values, i: values.u / values.r }));
-                setValues(values => ({ ...values, p: values.u * values.u / values.r }));
-                setColors(colors => ({ ...colors, i: "red", p: "red" }));
-            } else if (values.u === "" && values.i === "") {
-                /*calculate u and i */
-                setValues(values => ({ ...values, u: Math.sqrt(values.p * values.r) }));
-                setValues(values => ({ ...values, i: Math.sqrt(values.p / values.r) }));
-            } else if (values.u === "" && values.r === "") {
-                /*calculate u and r */
-                setValues(values => ({ ...values, u: values.p / values.i }));
-                setValues(values => ({ ...values, r: values.p / values.i / values.i }));
-            } else if (values.u === "" && values.p === "") {
-                /*calculate u and p */
-                setValues(values => ({ ...values, u: values.i * values.r }));
-                setValues(values => ({ ...values, p: values.i * values.i * values.r }));
-            } else {
-                /*calculate r and p */
-                setValues(values => ({ ...values, r: values.u / values.i }));
-                setValues(values => ({ ...values, p: values.u * values.i }));
-            }
         }
-    }
+
+        // Farben zurücksetzen
+        setColors({
+            u: "black",
+            i: "black",
+            r: "black",
+            p: "black"
+        });
+
+        if (values.i === "" && values.r === "") {
+            setValues(values => {
+                const i = values.p / values.u;
+                const r = values.u * values.u / values.p;
+                return { ...values, i, r };
+            });
+            setColors(colors => ({ ...colors, i: "red", r: "red" }));
+        } else if (values.i === "" && values.p === "") {
+            setValues(values => {
+                const i = values.u / values.r;
+                const p = values.u * values.u / values.r;
+                return { ...values, i, p };
+            });
+            setColors(colors => ({ ...colors, i: "red", p: "red" }));
+        } else if (values.u === "" && values.i === "") {
+            setValues(values => {
+                const u = Math.sqrt(values.p * values.r);
+                const i = Math.sqrt(values.p / values.r);
+                return { ...values, u, i };
+            });
+            setColors(colors => ({ ...colors, u: "red", i: "red" }));
+        } else if (values.u === "" && values.r === "") {
+            setValues(values => {
+                const u = values.p / values.i;
+                const r = values.p / values.i / values.i;
+                return { ...values, u, r };
+            });
+            setColors(colors => ({ ...colors, u: "red", r: "red" }));
+        } else if (values.u === "" && values.p === "") {
+            setValues(values => {
+                const u = values.i * values.r;
+                const p = values.i * values.i * values.r;
+                return { ...values, u, p };
+            });
+            setColors(colors => ({ ...colors, u: "red", p: "red" }));
+        } else {
+            setValues(values => {
+                const r = values.u / values.i;
+                const p = values.u * values.i;
+                return { ...values, r, p };
+            });
+            setColors(colors => ({ ...colors, r: "red", p: "red" }));
+        }
+    };
 
     return (
         <>
@@ -76,9 +118,10 @@ export default function Formelrad() {
                     <InputField color={colors.r} value={values.r} label="Widerstand" handleChange={e => { setValues(values => ({ ...values, r: e.target.value })) }} />
                     <InputField color={colors.p} value={values.p} label="Leistung" handleChange={e => { setValues(values => ({ ...values, p: e.target.value })) }} />
                     <button type="submit">Calculate</button>
-                    <p>{values.message}</p>
+                    <button style={{ margin: 10 }} onClick={handleClear}>Clear</button>
+                    <p style={{ color: "red" }}>{values.message}</p>
                 </form>
             </section>
         </>
-    )
+    );
 }
