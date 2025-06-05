@@ -8,7 +8,8 @@ export default function Formelrad() {
         u: 10,
         i: 2,
         r: "",
-        p: ""
+        p: "",
+        message: ""
     })
 
     const [colors, setColors] = useState({
@@ -26,7 +27,8 @@ export default function Formelrad() {
             u: "",
             i: "",
             r: "",
-            p: ""
+            p: "",
+            message: ""
         });
 
         setColors({
@@ -40,6 +42,14 @@ export default function Formelrad() {
     const calculate = (event) => {
         event.preventDefault();
         console.log("calculate");
+
+        const emptyFields = [values.u, values.i, values.r, values.p].filter(v => v === "").length;
+        if (emptyFields !== 2) {
+            setValues(values => ({ ...values, message: "Bitte genau zwei Felder leer lassen!" }));
+            return;
+        } else {
+            setValues(values => ({ ...values, message: "" }));
+        }
 
         if (values.i === "" && values.r === "") {
             setValues(values => ({ ...values, i: values.p / values.u }));
@@ -77,6 +87,7 @@ export default function Formelrad() {
                     <InputField color={colors.p} value={values.p} label="Leistung" handleChange={e => { setValues(values => ({ ...values, p: e.target.value })) }} />
                     <button type="submit">Calculate</button>
                     <button style={{ margin: 10 }} onClick={handleClear}>Clear</button>
+                    <p>{values.message}</p>
                 </form>
             </section>
         </>
