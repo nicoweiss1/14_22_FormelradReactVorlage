@@ -20,9 +20,22 @@ export default function Formelrad() {
         message: "red"
     });
 
+    function resetColors() {
+        setColors(colors => ({
+            ...colors,
+            u: "black",
+            i: "black",
+            r: "black",
+            p: "black"
+        }));
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log("handleSubmit");
+
+        // Farben zurücksetzen
+        resetColors();
 
         // Prüfen, ob genau zwei Felder leer sind
         const emptyFields = [values.u, values.i, values.r, values.p].filter(v => v === "").length;
@@ -32,15 +45,6 @@ export default function Formelrad() {
         } else {
             setValues(values => ({ ...values, message: "" }));
         }
-
-        // Reset Farben vor Berechnung
-        setColors({
-            u: "black",
-            i: "black",
-            r: "black",
-            p: "black",
-            message: "red"
-        });
 
         if (values.u === "" && values.i === "") {
             setValues(values => ({ ...values, u: Math.sqrt(values.p * values.r) }));
